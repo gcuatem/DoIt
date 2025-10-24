@@ -4,15 +4,17 @@
 {{- $inlineLeftDelimiter := $params.math.inlineLeftDelimiter | default "\\(" -}}
 {{- $inlineRightDelimiter := $params.math.inlineRightDelimiter | default "\\)" -}}
 {{- .Page.Scratch.Set "enableMath" true -}}
-{{- $opts := dict "output" "htmlAndMathml" "displayMode" (eq $.Type "block") -}}
-{{- /* Fallback for Hugo without try(): attempt server render, otherwise emit delimiters for client-side rendering */ -}}
-{{- $mathRendered := transform.ToMath .Inner $opts | default "" -}}
-{{- if $mathRendered -}}
-  {{- $mathRendered -}}
-{{- else -}}
-  {{- if eq $.Type "block" -}}
-    {{- $blockLeftDelimiter -}}{{- $.Inner -}}{{- $blockRightDelimiter -}}
-  {{- else -}}
-    {{- $inlineLeftDelimiter -}}{{- $.Inner -}}{{- $inlineRightDelimiter -}}
-  {{- end -}}
+{{- $opts := dict "output" "htmlAndMathml" "displayMode" (eq $.Type "block") }}
+{{- with try (transform.ToMath .Inner $opts) }}
+  {{- with .Err }}
+    {{/*  {{ warnf "Unable to render mathematical markup to HTML using the transform.ToMath function. The KaTeX display engine threw the following error: %s: see %s." . $.Position }}  */}}
+    {{/*  Fallback to client side rendering. Mainly for mhchem support. */}}
+    {{- if eq $.Type "block" -}}
+      {{- $blockLeftDelimiter -}}{{- $.Inner -}}{{- $blockRightDelimiter -}}
+    {{- else -}}
+      {{- $inlineLeftDelimiter -}}{{- $.Inner -}}{{- $inlineRightDelimiter -}}
+    {{- end -}}
+  {{- else }}
+    {{- .Value }}
+  {{- end }}
 {{- end -}}
