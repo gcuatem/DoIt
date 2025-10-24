@@ -1,13 +1,18 @@
-{{- $params := .Page.Scratch.Get "params" -}} {{- $blockLeftDelimiter :=
-$params.math.blockLeftDelimiter | default "\\[" -}} {{- $blockRightDelimiter :=
-$params.math.blockRightDelimiter | default "\\]" -}} {{- $inlineLeftDelimiter :=
-$params.math.inlineLeftDelimiter | default "\\(" -}} {{- $inlineRightDelimiter
-:= $params.math.inlineRightDelimiter | default "\\)" -}} {{- .Page.Scratch.Set
-"enableMath" true -}} {{- $opts := dict "output" "htmlAndMathml" "displayMode"
-(eq $.Type "block") }} {{- /* Fallback for Hugo without try(): attempt server
-render, otherwise emit delimiters for client-side rendering */ -}} {{-
-$mathRendered := transform.ToMath .Inner $opts | default "" -}} {{- if
-$mathRendered -}} {{- $mathRendered -}} {{- else -}} {{- if eq $.Type "block"
--}} {{- $blockLeftDelimiter -}}{{- $.Inner -}}{{- $blockRightDelimiter -}} {{-
-else -}} {{- $inlineLeftDelimiter -}}{{- $.Inner -}}{{- $inlineRightDelimiter
--}} {{- end -}} {{- end -}} {{- end -}}
+{{- $params := .Page.Scratch.Get "params" -}}
+{{- $blockLeftDelimiter := $params.math.blockLeftDelimiter | default "\\[" -}}
+{{- $blockRightDelimiter := $params.math.blockRightDelimiter | default "\\]" -}}
+{{- $inlineLeftDelimiter := $params.math.inlineLeftDelimiter | default "\\(" -}}
+{{- $inlineRightDelimiter := $params.math.inlineRightDelimiter | default "\\)" -}}
+{{- .Page.Scratch.Set "enableMath" true -}}
+{{- $opts := dict "output" "htmlAndMathml" "displayMode" (eq $.Type "block") -}}
+{{- /* Fallback for Hugo without try(): attempt server render, otherwise emit delimiters for client-side rendering */ -}}
+{{- $mathRendered := transform.ToMath .Inner $opts | default "" -}}
+{{- if $mathRendered -}}
+  {{- $mathRendered -}}
+{{- else -}}
+  {{- if eq $.Type "block" -}}
+    {{- $blockLeftDelimiter -}}{{- $.Inner -}}{{- $blockRightDelimiter -}}
+  {{- else -}}
+    {{- $inlineLeftDelimiter -}}{{- $.Inner -}}{{- $inlineRightDelimiter -}}
+  {{- end -}}
+{{- end -}}
